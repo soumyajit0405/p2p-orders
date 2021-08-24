@@ -105,6 +105,9 @@ public interface AllSellOrderRepository extends JpaRepository<AllSellOrder, Long
 	  @Query("Select a from AllContract a where a.contractStatusPl.contractStatusId=?1") 
 	  List<AllContract> getAllContracts(int statusId);
 	  
+	  @Query("Select b from AllContract b where b.allSellOrder.sellOrderId in (Select a.sellOrderId from AllSellOrder a where a.allUser.locality.localityId=?1 and orderStatusPl.orderStatusId not in ?2)") 
+	  List<AllContract> getAllContracts(int localityId,List<Integer> status);
+	  
 	  @Query("Select a from AllContract a where a.contractId=?1") 
 	  AllContract getContractbyId(int contractId);
 	  
@@ -119,6 +122,9 @@ public interface AllSellOrderRepository extends JpaRepository<AllSellOrder, Long
 	  
 	  @Query("Select a from AllSellOrder a where a.allUser.locality.localityId=?1 and orderStatusPl.orderStatusId <>?2") 
 	  List<AllSellOrder> getAllSellOrders( int stateId, int statusId);
+	  
+	  @Query("Select a from AllSellOrder a where a.allUser.locality.localityId=?1 and orderStatusPl.orderStatusId not in ?2") 
+	  List<AllSellOrder> getAllSellOrders( int localityId, List<Integer> statusId);
 	  
 	  @Query("Select a from AllSellOrder a where a.allUser.userId=?1 and date(a.transferStartTs)>=?2 and date(a.transferEndTs)<=?3 and a.orderStatusPl.orderStatusId =?4 ") 
 	  List<AllSellOrder> getAllSellOrdersForUser( int userId, Date startDate, Date endDate, int statusId);

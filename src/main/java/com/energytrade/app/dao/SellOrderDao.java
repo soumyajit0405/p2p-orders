@@ -5,6 +5,7 @@ import java.sql.Timestamp;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -349,7 +350,10 @@ public HashMap<String,Object> getAllSellOrders(int userId) {
     	AllUser alluser = allsellorderrepo.getUserById(userId);
     	List<AllSellOrderDto> listDto= new ArrayList<AllSellOrderDto>();
     	//List<AllSellOrder> allSellList= allsellorderrepo.getAllSellOrders(alluser.getAllState().getStateId(),2);
-    	List<AllSellOrder> allSellList= allsellorderrepo.getAllSellOrders(alluser.getLocality().getLocalityId(),2);
+    	Integer[] status = {2,7,8};
+    	List<Integer> orderStatus = new ArrayList<Integer>(Arrays.asList(status));
+    	
+    	List<AllSellOrder> allSellList= allsellorderrepo.getAllSellOrders(alluser.getLocality().getLocalityId(),orderStatus);
     	String bcStatus = AppStartupRunner.configValues.get("blockChain");
     	if(allSellList.size() > 0) {
     		
@@ -402,7 +406,7 @@ public HashMap<String,Object> getAllSellOrders(int userId) {
     		}
     	}
     		List<AllContractDto> contractListDto= new ArrayList<AllContractDto>();
-        	List<AllContract> allContractList= allsellorderrepo.getAllContracts(4);
+        	List<AllContract> allContractList= allsellorderrepo.getAllContracts(alluser.getLocality().getLocalityId(),orderStatus);
         	if(allContractList.size() > 0) {
         		for(int i=0;i<allContractList.size();i++) {
         			AllContractDto allcontractdto = new AllContractDto();
@@ -1334,7 +1338,7 @@ try {
  	
  	List<AllUserByAdminDto> listDto= new ArrayList<AllUserByAdminDto>();
  	AllUser alluser = allsellorderrepo.getUserById(userId);
- 	List<AllUser> allUserLists= allsellorderrepo.getUSersByAdmin(userId,alluser.getAllState().getStateId());
+ 	List<AllUser> allUserLists= allsellorderrepo.getUSersByAdmin(userId,alluser.getLocality().getLocalityId());
  	if(allUserLists.size() > 0) {
  		for(int i=0;i<allUserLists.size();i++) {
  			 AllUserByAdminDto alluserdto=new AllUserByAdminDto();
