@@ -12,6 +12,7 @@ import java.util.List;
 
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -76,6 +77,11 @@ public class SellOrderDao extends AbstractBaseDao
 	@Autowired
 	AllBlockchainOrderRepository allbcorderrepo;
 	
+	@Value( "${search.timeFrame}" )
+	private String searchTimeFrame;
+
+	
+	BigDecimal zero = new BigDecimal("0");
 	CommonUtility cm= new CommonUtility();
 	
 	/*
@@ -235,7 +241,8 @@ public class SellOrderDao extends AbstractBaseDao
         				tradeData.put("isFineApplicable",sellorder.getIsFineApplicable());
         			}
         			tradeData.put("type","Buy-Order");
-        			totalAmountSpent.add(sellorder.getTotalAmount());
+        			System.out.println(sellorder.getTotalAmount());
+        			totalAmountSpent = totalAmountSpent.add(sellorder.getTotalAmount());
         			listOfTrades.add(tradeData);
         		}
         	}
@@ -909,6 +916,8 @@ try {
  	List<AllSellOrderDto> listDto= new ArrayList<AllSellOrderDto>();
  	List<AllSellOrder> allSellList= allsellorderrepo.getAllSellOrdersByUser(userId);
  	String bcStatus = AppStartupRunner.configValues.get("blockChain");
+ 	Integer[] status = {1,4};
+	List<Integer> orderStatus = new ArrayList<Integer>(Arrays.asList(status));
  	if(allSellList.size() > 0) {
  		
  		for(int i=0;i<allSellList.size();i++) {
@@ -931,8 +940,41 @@ try {
  			allsellorderdto.setIsEditable(cm.setIsEditable(allSellList.get(i).getTransferStartTs(),allSellList.get(i).getOrderStatusPl().getOrderStatusName()));
  			allsellorderdto.setLocalityId(allSellList.get(i).getAllUser().getLocality().getLocalityId());
 			allsellorderdto.setLocalityName(allSellList.get(i).getAllUser().getLocality().getLocalityName());
+			allsellorderdto.setSellerName(allSellList.get(i).getAllUser().getFullName());
+			List<AllContract> contracts = allsellorderrepo.getContractByOrder(allSellList.get(i).getSellOrderId(), orderStatus);
+			if(contracts.size() > 0) {
+				allsellorderdto.setBuyerName(contracts.get(0).getAllUser().getFullName());
+				if(contracts.get(0).getBuyerEnergyTfr() != null) {
+					allsellorderdto.setBuyerEnergyTfr(contracts.get(0).getBuyerEnergyTfr());
+				} else {
+					allsellorderdto.setBuyerEnergyTfr(zero);
+				}
+				if(contracts.get(0).getBuyerFine() != null) {
+					allsellorderdto.setBuyerFine(contracts.get(0).getBuyerFine());
+				}else {
+					allsellorderdto.setBuyerFine(zero);
+				}
+				
+			} else {
+				allsellorderdto.setBuyerEnergyTfr(zero);
+				allsellorderdto.setBuyerFine(zero);
+			}
+			
 			if(allSellList.get(i).getEnergy() != null) {
 				allsellorderdto.setEnergy(allSellList.get(i).getEnergy());
+				
+			}
+			if(allSellList.get(i).getSellerEnergyTfr() != null) {
+				allsellorderdto.setSellerEnergyTfr(allSellList.get(i).getSellerEnergyTfr());
+				
+			}else {
+				allsellorderdto.setSellerEnergyTfr(zero);
+			}
+			if(allSellList.get(i).getSellerFine() != null) {
+				allsellorderdto.setSellerFine(allSellList.get(i).getSellerFine());
+				
+			}else {
+				allsellorderdto.setSellerFine(zero);
 			}
 			if(allSellList.get(i).getIsFineApplicable() != null) {
 				allsellorderdto.setIsFineApplicable(allSellList.get(i).getIsFineApplicable());
@@ -962,6 +1004,17 @@ try {
      			allcontractdto.setContractStatus(allContractList.get(i).getContractStatusPl().getContractStatusName());
      			allcontractdto.setIsCancellable(cm.setIsCancellable(allContractList.get(i).getAllSellOrder().getTransferStartTs(),allContractList.get(i).getContractStatusPl().getContractStatusName()));
      			allcontractdto.setIsEditable("N");
+     			allcontractdto.setBuyerName(allContractList.get(i).getAllUser().getFullName());
+     			if(allContractList.get(i).getBuyerEnergyTfr() != null) {
+     				allcontractdto.setBuyerEnergyTfr(allContractList.get(i).getBuyerEnergyTfr());
+				}else {
+					allcontractdto.setBuyerEnergyTfr(zero);
+				}
+			if(allContractList.get(i).getBuyerFine() != null) {
+				allcontractdto.setBuyerFine(allContractList.get(i).getBuyerFine());
+				}else {
+					allcontractdto.setBuyerFine(zero);
+				}
      			AllSellOrder sellorder = allContractList.get(i).getAllSellOrder();
      			AllSellOrderDto allsellorderdto = new AllSellOrderDto();
      			allsellorderdto.setDeviceTypeName(sellorder.getDevicePl().getDeviceTypeName());
@@ -978,11 +1031,38 @@ try {
      			allsellorderdto.setLocalityId(sellorder.getAllUser().getLocality().getLocalityId());
     			allsellorderdto.setLocalityName(sellorder.getAllUser().getLocality().getLocalityName());
     			allsellorderdto.setDeviceTypeId(sellorder.getDevicePl().getDeviceTypeId());
+    			allsellorderdto.setSellerName(sellorder.getAllUser().getFullName());
+    			if(allContractList.get(i).getBuyerEnergyTfr() != null) {
+    					allsellorderdto.setBuyerEnergyTfr(allContractList.get(i).getBuyerEnergyTfr());
+    				}else {
+    					allsellorderdto.setBuyerEnergyTfr(zero);
+    				}
+    			if(allContractList.get(i).getBuyerFine() != null) {
+    					allsellorderdto.setBuyerFine(allContractList.get(i).getBuyerFine());
+    				}else {
+    					allsellorderdto.setBuyerFine(zero);
+    				}
+    			
     			if(sellorder.getEnergy() != null) {
     				allsellorderdto.setEnergy(sellorder.getEnergy());
     			}
     			if(sellorder.getIsFineApplicable() != null) {
     				allsellorderdto.setIsFineApplicable(sellorder.getIsFineApplicable());
+    			}
+    			if(sellorder.getSellerEnergyTfr() != null) {
+    				allsellorderdto.setSellerEnergyTfr(sellorder.getSellerEnergyTfr());
+    				
+    			}else {
+					allsellorderdto.setSellerEnergyTfr(zero);
+				}
+    			if(sellorder.getSellerFine() != null) {
+    				allsellorderdto.setSellerFine(sellorder.getSellerFine());
+    				
+    			}else {
+					allsellorderdto.setSellerFine(zero);
+				}
+    			if(allContractList.get(i).getIsFineApplicable() != null) {
+    				allcontractdto.setIsFineApplicable(allContractList.get(i).getIsFineApplicable());
     			}
     			if(bcStatus.equalsIgnoreCase("Y")) {
     				String bcTxStatus = allsellorderrepo.getBlockChainStatus(sellorder.getSellOrderId());
@@ -1263,19 +1343,21 @@ try {
 	 	
 	 	HashMap<String,Object> response = new HashMap<String, Object>();
 	 	List<AllSellOrder> allSellList  =  new ArrayList<AllSellOrder>();
+	 	int timeFrame = Integer.parseInt(searchTimeFrame);
 	 try {
 		 String bcStatus = AppStartupRunner.configValues.get("blockChain");
 			AllUser user = allsellorderrepo.getUserById(Integer.parseInt(inputDetails.get("userId")));
+			if(user!=null) {
 		 	BigDecimal minUnits= new BigDecimal(inputDetails.get("minUnits"));
 		 	BigDecimal maxUnits= new BigDecimal(inputDetails.get("maxUnits"));
 		 	BigDecimal minAmount= new BigDecimal(inputDetails.get("minAmount"));
 		 	BigDecimal maxAmount= new BigDecimal(inputDetails.get("maxAmount"));
 		 	Timestamp transferEndTs= Timestamp.valueOf(inputDetails.get("transferEndTs"));
 		 	Timestamp transferStartTs= Timestamp.valueOf(inputDetails.get("transferStartTs"));
-		 	Timestamp preTransferStartTs= new Timestamp(transferStartTs.getTime() - (1000*60*60*1));
+		 	Timestamp preTransferStartTs= new Timestamp(transferStartTs.getTime() - (timeFrame*60*60*1));
 		 	//Timestamp postTransferStartTs= new Timestamp(transferStartTs.getTime() + (1000*60*60*1));
 		 	//Timestamp preTransferEndTs= new Timestamp(transferEndTs.getTime() - (1000*60*60*1));
-		 	Timestamp postTransferEndTs= new Timestamp(transferEndTs.getTime() + (1000*60*60*1));
+		 	Timestamp postTransferEndTs= new Timestamp(transferEndTs.getTime() + (timeFrame*60*60*1));
 		 	String preStartTs= preTransferStartTs.toString().substring(0, 19);
 		 	String postEndTs= postTransferEndTs.toString().substring(0, 19);
 		 	if(!inputDetails.get("deviceTypeId").equalsIgnoreCase("-1")) {
@@ -1301,8 +1383,12 @@ try {
 	    			allsellorderdto.setTransferEndTs(allSellList.get(i).getTransferEndTs().toString());
 	    			allsellorderdto.setTransferStartTs(allSellList.get(i).getTransferStartTs().toString());
 	    			allsellorderdto.setUserDeviceId(allSellList.get(i).getUserDevice().getUserDeviceId());
-	    			allsellorderdto.setLocalitionId(allSellList.get(i).getAllUser().getLocality().getLocalityId());
-	    			allsellorderdto.setLocationName(allSellList.get(i).getAllUser().getLocality().getLocalityName());
+	    			if(allSellList.get(i).getAllUser().getLocality() != null) {
+	    				allsellorderdto.setLocalitionId(allSellList.get(i).getAllUser().getLocality().getLocalityId());
+		    			allsellorderdto.setLocationName(allSellList.get(i).getAllUser().getLocality().getLocalityName());
+	    			}
+//	    			allsellorderdto.setLocalitionId(allSellList.get(i).getAllUser().getLocality().getLocalityId());
+//	    			allsellorderdto.setLocationName(allSellList.get(i).getAllUser().getLocality().getLocalityName());
 	    			allsellorderdto.setEnergy(allSellList.get(i).getEnergy());
 	    			if (bcStatus.equalsIgnoreCase("Y")) {
 	    			String bcTxStatus = allsellorderrepo.getBlockChainStatus(allSellList.get(i).getSellOrderId());
@@ -1321,6 +1407,12 @@ try {
 	 		response.put("key","200");
 	 	
 	 }
+	  else {
+		 	response.put("data", "No user Found");
+		 	response.put("message",CustomMessages.getCustomMessages("SUC"));
+		 		response.put("key","200");
+	 }
+	 }
 	     catch (Exception e) {
 	         System.out.println("Error in checkExistence" + e.getMessage());
 	         e.printStackTrace();
@@ -1338,7 +1430,7 @@ try {
  	
  	List<AllUserByAdminDto> listDto= new ArrayList<AllUserByAdminDto>();
  	AllUser alluser = allsellorderrepo.getUserById(userId);
- 	List<AllUser> allUserLists= allsellorderrepo.getUSersByAdmin(userId,alluser.getLocality().getLocalityId());
+ 	List<AllUser> allUserLists= allsellorderrepo.getUSersByAdmin(userId,alluser.getAllState().getStateId());
  	if(allUserLists.size() > 0) {
  		for(int i=0;i<allUserLists.size();i++) {
  			 AllUserByAdminDto alluserdto=new AllUserByAdminDto();
