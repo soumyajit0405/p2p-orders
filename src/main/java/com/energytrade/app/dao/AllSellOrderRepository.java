@@ -108,6 +108,12 @@ public interface AllSellOrderRepository extends JpaRepository<AllSellOrder, Long
 	  @Query("Select b from AllContract b where b.allSellOrder.sellOrderId in (Select a.sellOrderId from AllSellOrder a where a.sellOrderId=?1 and orderStatusPl.orderStatusId not in ?2)") 
 	  List<AllContract> getContractByOrder(int sellOrderId,List<Integer> status);
 	  
+	  @Query("Select b from AllContract b where b.allSellOrder.sellOrderId in (Select a.sellOrderId from AllSellOrder a where a.allUser.locality.localityId=?1 and orderStatusPl.orderStatusId not in ?2)") 
+	  List<AllContract> getAllContracts(int localityId,List<Integer> status);
+	  
+	  @Query("Select b from AllContract b where b.allSellOrder.sellOrderId in (Select a.sellOrderId from AllSellOrder a where a.sellOrderId=?1 and orderStatusPl.orderStatusId not in ?2)") 
+	  List<AllContract> getContractByOrder(int sellOrderId,List<Integer> status);
+	  
 	  @Query("Select a from AllContract a where a.contractId=?1") 
 	  AllContract getContractbyId(int contractId);
 	  

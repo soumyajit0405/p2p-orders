@@ -80,7 +80,6 @@ public class SellOrderDao extends AbstractBaseDao
 	@Value( "${search.timeFrame}" )
 	private String searchTimeFrame;
 	
-	
 	BigDecimal zero = new BigDecimal("0");
 	CommonUtility cm= new CommonUtility();
 	
@@ -1402,8 +1401,8 @@ try {
 	    			allsellorderdto.setTransferStartTs(allSellList.get(i).getTransferStartTs().toString());
 	    			allsellorderdto.setUserDeviceId(allSellList.get(i).getUserDevice().getUserDeviceId());
 	    			if(allSellList.get(i).getAllUser().getLocality() != null) {
-	    			allsellorderdto.setLocalitionId(allSellList.get(i).getAllUser().getLocality().getLocalityId());
-	    			allsellorderdto.setLocationName(allSellList.get(i).getAllUser().getLocality().getLocalityName());
+	    				allsellorderdto.setLocalitionId(allSellList.get(i).getAllUser().getLocality().getLocalityId());
+		    			allsellorderdto.setLocationName(allSellList.get(i).getAllUser().getLocality().getLocalityName());
 	    			}
 //	    			allsellorderdto.setLocalitionId(allSellList.get(i).getAllUser().getLocality().getLocalityId());
 //	    			allsellorderdto.setLocationName(allSellList.get(i).getAllUser().getLocality().getLocalityName());

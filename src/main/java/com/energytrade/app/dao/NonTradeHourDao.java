@@ -65,7 +65,7 @@ public class NonTradeHourDao extends AbstractBaseDao
     	// Cancel Logic Proceeds - TO DO
     	
     	nontradehourrepo.save(nontradehour);
-    	List<Integer> listSellOrders=getAllSellOrders(startTs,endTs,locality.getLocalityId());
+    	List<Integer> listSellOrders=getSellOrdersByLocality(startTs,endTs,locality.getLocalityId());
     	//List<Integer> listSellOrders=getAllSellOrders(startTs,endTs);
     	int iResponse=cancelSellOrders(listSellOrders);
     	if(iResponse == -1) {
@@ -181,12 +181,12 @@ public HashMap<String,Object> getNonTradeHours(int userId) {
 		return listSellOrders;
 	}
 		
-		public List<Integer> getAllSellOrders(Timestamp startDate, Timestamp endDate) throws ParseException {
+		public List<Integer> getSellOrdersByLocality(Timestamp startDate, Timestamp endDate, int localityId) throws ParseException {
 			
 			List<Integer> listSellOrders= null;
 		
 		try {
-			listSellOrders=nontradehourrepo.getSellOrders(startDate.toString(), endDate.toString());
+			listSellOrders=nontradehourrepo.getSellOrders(startDate.toString(), endDate.toString(),localityId);
 			
 		}
 		catch(Exception e) {
