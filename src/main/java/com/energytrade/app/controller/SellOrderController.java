@@ -134,4 +134,13 @@ public class SellOrderController extends AbstractBaseController
     	response.put("response", sellOrderService.getUSersByAdmin(userId));
     	return response;
     }
+    
+    @RequestMapping(value =REST+"validateTrade" , method =  RequestMethod.POST , headers =  "Accept=application/json" )
+    public HashMap<String,Object> validateTrade(@RequestBody HashMap<String,Object> inputDetails) {
+        
+    	HashMap<String,Object> response=new HashMap<String, Object>();
+    	response.put("response", sellOrderService.validateTrade(inputDetails));
+    	return response;
+    }
+
 }

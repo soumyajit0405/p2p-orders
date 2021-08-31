@@ -17,7 +17,16 @@ public class AllContractDto{
 	private String isEditable;
 	private String isFineApplicable;
 	private String blockChainStatus;
+	private String buyerName;
 	
+	public String getBuyerName() {
+		return buyerName;
+	}
+
+	public void setBuyerName(String buyerName) {
+		this.buyerName = buyerName;
+	}
+
 	public String getBlockChainStatus() {
 		return blockChainStatus;
 	}

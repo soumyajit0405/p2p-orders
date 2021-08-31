@@ -72,4 +72,8 @@ public class SellOrderService extends AbstractBaseService
     	return this.sellorderdao.createMultipleSellOrder(inputDetails);
     }
     
+    public HashMap<String,Object> validateTrade(HashMap<String,Object> inputDetails) {
+        return this.sellorderdao.validateTrade(inputDetails);
+    }
+    
 }

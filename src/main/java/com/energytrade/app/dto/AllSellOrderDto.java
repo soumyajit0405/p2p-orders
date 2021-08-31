@@ -16,7 +16,25 @@ public class AllSellOrderDto{
 	private BigDecimal energy;
 	private String isFineApplicable;
 	private String blockChainStatus;
+	private BigDecimal buyerEnergyTfr;
+	private BigDecimal buyerFine;
 	
+	public BigDecimal getBuyerEnergyTfr() {
+		return buyerEnergyTfr;
+	}
+
+	public void setBuyerEnergyTfr(BigDecimal buyerEnergyTfr) {
+		this.buyerEnergyTfr = buyerEnergyTfr;
+	}
+
+	public BigDecimal getBuyerFine() {
+		return buyerFine;
+	}
+
+	public void setBuyerFine(BigDecimal buyerFine) {
+		this.buyerFine = buyerFine;
+	}
+
 	public String getBlockChainStatus() {
 		return blockChainStatus;
 	}
