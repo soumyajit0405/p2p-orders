@@ -102,11 +102,8 @@ public interface AllSellOrderRepository extends JpaRepository<AllSellOrder, Long
 	  @Query("Select a from AllContract a ") 
 	  List<AllContract> getAllContracts();
 	  
-	  @Query("Select b from AllContract b where b.allSellOrder.sellOrderId in (Select a.sellOrderId from AllSellOrder a where a.allUser.locality.localityId=?1 and orderStatusPl.orderStatusId not in ?2)") 
-	  List<AllContract> getAllContracts(int localityId,List<Integer> status);
-	  
-	  @Query("Select b from AllContract b where b.allSellOrder.sellOrderId in (Select a.sellOrderId from AllSellOrder a where a.sellOrderId=?1 and orderStatusPl.orderStatusId not in ?2)") 
-	  List<AllContract> getContractByOrder(int sellOrderId,List<Integer> status);
+	  @Query("Select a from AllContract a where a.contractStatusPl.contractStatusId=?1") 
+	  List<AllContract> getAllContracts(int statusId);
 	  
 	  @Query("Select b from AllContract b where b.allSellOrder.sellOrderId in (Select a.sellOrderId from AllSellOrder a where a.allUser.locality.localityId=?1 and orderStatusPl.orderStatusId not in ?2)") 
 	  List<AllContract> getAllContracts(int localityId,List<Integer> status);
@@ -119,6 +116,104 @@ public interface AllSellOrderRepository extends JpaRepository<AllSellOrder, Long
 	  
 	 @Query("Select a from AllContract a , AllSellOrder b where a.allUser.userId=?1 and date(b.transferStartTs)>=?2 and date(b.transferEndTs)<=?3 and a.contractStatusPl.contractStatusId =?4 and a.allSellOrder.sellOrderId = b.sellOrderId") 
 	  List<AllContract> getAllContractsByUser(int userId, Date startDate, Date endDate, int statusId);
+	 
+	 @Query(nativeQuery = true, value = "select max(a) from (select count(*) as a from all_sell_orders where transfer_start_ts <= ?2 and transfer_end_ts >=?2 "
+	 		+ "and seller_id =?1 and order_status_id=?4 "
+	 		+ "union "
+	 		+ "select count(*) as a from all_sell_orders where transfer_start_ts <= ?3 and transfer_end_ts >=?3 "
+	 		+ "and seller_id =?1 and order_status_id=?4 "
+	 		+ "union  "
+	 		+ "select count(*) as a from all_sell_orders where transfer_start_ts >= ?2 and transfer_end_ts <=?3 "
+	 		+ "and seller_id =?1 and order_status_id=?4) as tab") 
+	 int validateSellOrder(int userId, String startDate, String endDate, int statusId);
+	 
+	 @Query(nativeQuery = true, value = "select sum(a) from (select power_to_sell as a from all_sell_orders where transfer_start_ts <= ?2 and transfer_end_ts >=?2 "
+		 		+ "and seller_id =?1 and order_status_id=?4 "
+		 		+ "union "
+		 		+ "select power_to_sell as a from all_sell_orders where transfer_start_ts <= ?3 and transfer_end_ts >=?3 "
+		 		+ "and seller_id =?1 and order_status_id=?4 "
+		 		+ "union  "
+		 		+ "select power_to_sell as a from all_sell_orders where transfer_start_ts >= ?2 and transfer_end_ts <=?3 "
+		 		+ "and seller_id =?1 and order_status_id=?4) as tab") 
+		 BigDecimal validateSellOrderByPower(int userId, String startDate, String endDate, int statusId);
+	 
+	 @Query(nativeQuery = true, value = "select max(a) from ( "
+	 		+ "    select "
+	 		+ "        count(*) as a "
+	 		+ "    from "
+	 		+ "        all_sell_orders aso, all_contracts ac "
+	 		+ "    where "
+	 		+ "    aso.sell_order_id = ac.sell_order_id "
+	 		+ "        and aso.transfer_start_ts "
+	 		+ "         <= ?2 "
+	 		+ "        and aso.transfer_end_ts "
+	 		+ "         >=  ?2"
+	 		+ "        and ac.buyer_id = ?1 "
+	 		+ "        and aso.order_status_id=?4 "
+	 		+ "    union "
+	 		+ "    select "
+	 		+ "        count(*) as a "
+	 		+ "    from "
+	 		+ "        all_sell_orders aso, all_contracts ac "
+	 		+ "    where "
+	 		+ "    aso.sell_order_id = ac.sell_order_id "
+	 		+ "    and  "
+	 		+ "        aso.transfer_start_ts <=?3 "
+	 		+ "        and  aso.transfer_end_ts >=?3 "
+	 		+ "        and ac.buyer_id =?1 "
+	 		+ "        and aso.order_status_id=?4 "
+	 		+ "    union "
+	 		+ "    select "
+	 		+ "        count(*) as a  "
+	 		+ "    from "
+	 		+ "        all_sell_orders aso, all_contracts ac "
+	 		+ "    where "
+	 		+ "    aso.sell_order_id = ac.sell_order_id "
+	 		+ "    and  "
+	 		+ "        aso.transfer_start_ts >= ?2 "
+	 		+ "        and aso.transfer_end_ts <=?3 "
+	 		+ "        and ac.buyer_id =?1 "
+	 		+ "        and aso.order_status_id=?4  ) as tab") 
+		 int validateContract(int userId, String startDate, String endDate, int statusId);
+	 
+	 
+	 @Query(nativeQuery = true, value = "select sum(a) from ( "
+		 		+ "    select power_to_sell as a "
+		 		+ "    from "
+		 		+ "        all_sell_orders aso, all_contracts ac "
+		 		+ "    where "
+		 		+ "    aso.sell_order_id = ac.sell_order_id "
+		 		+ "        and aso.transfer_start_ts "
+		 		+ "         <= ?2 "
+		 		+ "        and aso.transfer_end_ts "
+		 		+ "         >=  ?2"
+		 		+ "        and ac.buyer_id = ?1 "
+		 		+ "        and aso.order_status_id=?4 "
+		 		+ "    union "
+		 		+ "    select "
+		 		+ "        power_to_sell as a "
+		 		+ "    from "
+		 		+ "        all_sell_orders aso, all_contracts ac "
+		 		+ "    where "
+		 		+ "    aso.sell_order_id = ac.sell_order_id "
+		 		+ "    and  "
+		 		+ "        aso.transfer_start_ts <=?3 "
+		 		+ "        and  aso.transfer_end_ts >=?3 "
+		 		+ "        and ac.buyer_id =?1 "
+		 		+ "        and aso.order_status_id=?4 "
+		 		+ "    union "
+		 		+ "    select "
+		 		+ "       power_to_sell as a  "
+		 		+ "    from "
+		 		+ "        all_sell_orders aso, all_contracts ac "
+		 		+ "    where "
+		 		+ "    aso.sell_order_id = ac.sell_order_id "
+		 		+ "    and  "
+		 		+ "        aso.transfer_start_ts >= ?2 "
+		 		+ "        and aso.transfer_end_ts <=?3 "
+		 		+ "        and ac.buyer_id =?1 "
+		 		+ "        and aso.order_status_id=?4  ) as tab") 
+			 BigDecimal validateContractByPower(int userId, String startDate, String endDate, int statusId);
 	  
 	  @Query("Select a from AllSellOrder a where a.allUser.allState.stateId=?1 ") 
 	  List<AllSellOrder> getAllSellOrders( int stateId);
@@ -171,103 +266,5 @@ public interface AllSellOrderRepository extends JpaRepository<AllSellOrder, Long
 	  @Query("Select a from GeneralConfig a where a.name in ?1")
 	    ArrayList<GeneralConfig> getBlockChainConfig(ArrayList<String> listOfValues);
 
-	  @Query(nativeQuery = true, value = "select max(a) from (select count(*) as a from all_sell_orders where transfer_start_ts <= ?2 and transfer_end_ts >=?2 "
-		 		+ "and seller_id =?1 and order_status_id=?4 "
-		 		+ "union "
-		 		+ "select count(*) as a from all_sell_orders where transfer_start_ts <= ?3 and transfer_end_ts >=?3 "
-		 		+ "and seller_id =?1 and order_status_id=?4 "
-		 		+ "union  "
-		 		+ "select count(*) as a from all_sell_orders where transfer_start_ts >= ?2 and transfer_end_ts <=?3 "
-		 		+ "and seller_id =?1 and order_status_id=?4) as tab") 
-		 int validateSellOrder(int userId, String startDate, String endDate, int statusId);
-		 
-		 @Query(nativeQuery = true, value = "select sum(a) from (select power_to_sell as a from all_sell_orders where transfer_start_ts <= ?2 and transfer_end_ts >=?2 "
-			 		+ "and seller_id =?1 and order_status_id=?4 "
-			 		+ "union "
-			 		+ "select power_to_sell as a from all_sell_orders where transfer_start_ts <= ?3 and transfer_end_ts >=?3 "
-			 		+ "and seller_id =?1 and order_status_id=?4 "
-			 		+ "union  "
-			 		+ "select power_to_sell as a from all_sell_orders where transfer_start_ts >= ?2 and transfer_end_ts <=?3 "
-			 		+ "and seller_id =?1 and order_status_id=?4) as tab") 
-			 BigDecimal validateSellOrderByPower(int userId, String startDate, String endDate, int statusId);
-		 
-		 @Query(nativeQuery = true, value = "select max(a) from ( "
-		 		+ "    select "
-		 		+ "        count(*) as a "
-		 		+ "    from "
-		 		+ "        all_sell_orders aso, all_contracts ac "
-		 		+ "    where "
-		 		+ "    aso.sell_order_id = ac.sell_order_id "
-		 		+ "        and aso.transfer_start_ts "
-		 		+ "         <= ?2 "
-		 		+ "        and aso.transfer_end_ts "
-		 		+ "         >=  ?2"
-		 		+ "        and ac.buyer_id = ?1 "
-		 		+ "        and aso.order_status_id=?4 "
-		 		+ "    union "
-		 		+ "    select "
-		 		+ "        count(*) as a "
-		 		+ "    from "
-		 		+ "        all_sell_orders aso, all_contracts ac "
-		 		+ "    where "
-		 		+ "    aso.sell_order_id = ac.sell_order_id "
-		 		+ "    and  "
-		 		+ "        aso.transfer_start_ts <=?3 "
-		 		+ "        and  aso.transfer_end_ts >=?3 "
-		 		+ "        and ac.buyer_id =?1 "
-		 		+ "        and aso.order_status_id=?4 "
-		 		+ "    union "
-		 		+ "    select "
-		 		+ "        count(*) as a  "
-		 		+ "    from "
-		 		+ "        all_sell_orders aso, all_contracts ac "
-		 		+ "    where "
-		 		+ "    aso.sell_order_id = ac.sell_order_id "
-		 		+ "    and  "
-		 		+ "        aso.transfer_start_ts >= ?2 "
-		 		+ "        and aso.transfer_end_ts <=?3 "
-		 		+ "        and ac.buyer_id =?1 "
-		 		+ "        and aso.order_status_id=?4  ) as tab") 
-			 int validateContract(int userId, String startDate, String endDate, int statusId);
-		 
-		 
-		 @Query(nativeQuery = true, value = "select sum(a) from ( "
-			 		+ "    select power_to_sell as a "
-			 		+ "    from "
-			 		+ "        all_sell_orders aso, all_contracts ac "
-			 		+ "    where "
-			 		+ "    aso.sell_order_id = ac.sell_order_id "
-			 		+ "        and aso.transfer_start_ts "
-			 		+ "         <= ?2 "
-			 		+ "        and aso.transfer_end_ts "
-			 		+ "         >=  ?2"
-			 		+ "        and ac.buyer_id = ?1 "
-			 		+ "        and aso.order_status_id=?4 "
-			 		+ "    union "
-			 		+ "    select "
-			 		+ "        power_to_sell as a "
-			 		+ "    from "
-			 		+ "        all_sell_orders aso, all_contracts ac "
-			 		+ "    where "
-			 		+ "    aso.sell_order_id = ac.sell_order_id "
-			 		+ "    and  "
-			 		+ "        aso.transfer_start_ts <=?3 "
-			 		+ "        and  aso.transfer_end_ts >=?3 "
-			 		+ "        and ac.buyer_id =?1 "
-			 		+ "        and aso.order_status_id=?4 "
-			 		+ "    union "
-			 		+ "    select "
-			 		+ "       power_to_sell as a  "
-			 		+ "    from "
-			 		+ "        all_sell_orders aso, all_contracts ac "
-			 		+ "    where "
-			 		+ "    aso.sell_order_id = ac.sell_order_id "
-			 		+ "    and  "
-			 		+ "        aso.transfer_start_ts >= ?2 "
-			 		+ "        and aso.transfer_end_ts <=?3 "
-			 		+ "        and ac.buyer_id =?1 "
-			 		+ "        and aso.order_status_id=?4  ) as tab") 
-				 BigDecimal validateContractByPower(int userId, String startDate, String endDate, int statusId);
-		
 	      
 }
