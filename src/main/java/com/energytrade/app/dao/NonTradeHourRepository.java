@@ -43,12 +43,12 @@ public interface NonTradeHourRepository extends JpaRepository<NonTradeHour, Long
 	  @Query("Select a.sellOrderId from AllSellOrder a where a.transferStartTs >=?1 and a.transferStartTs <=?2 and a.allUser.locality.localityId=?3") 
 	  List<Integer> getSellOrders(  Timestamp startDate , Timestamp endDate, int localityId);
 	  
-	  @Query(value ="Select sell_order_id from all_sell_orders  where transfer_start_ts >=:startDate and transfer_start_ts <=:endDate and a.allUser.locality.localityId=:localityId union "
-		  		+ "Select sell_order_id from all_sell_orders  where transfer_end_ts >=:startDate and transfer_end_ts <=:endDate and a.allUser.locality.localityId=:localityId union 	"
-		  		+ "Select sell_order_id from all_sell_orders  where transfer_start_ts <=:startDate and transfer_end_ts >=:endDate and order_status_id <> 2 and a.allUser.locality.localityId=:localityId",nativeQuery = true) 
+	  @Query(value ="Select sell_order_id from all_sell_orders,all_users  where transfer_start_ts >=:startDate and transfer_start_ts <=:endDate and locality_id=:localityId union "
+		  		+ "Select sell_order_id from all_sell_orders,all_users  where transfer_end_ts >=:startDate and transfer_end_ts <=:endDate and locality_id=:localityId union 	"
+		  		+ "Select sell_order_id from all_sell_orders,all_users  where transfer_start_ts <=:startDate and transfer_end_ts >=:endDate and order_status_id <> 2 and locality_id=:localityId",nativeQuery = true) 
 		  List<Integer> getSellOrders( @Param("startDate") String startDate ,@Param("endDate") String endDate, @Param("localityId") int localityId);
 	  
-	  @Modifying  
+	  @Modifying   
 	  @Query("update NonTradeHour a set a.nonTradeReason=?1,a.startTs=?2,a.endTs=?3,a.locality.localityId=?5  where a.nonTradeHourId=?4"
 	  ) void editSellOrder(String reason,Timestamp startTime,Timestamp endTime, int nonTradeHourId, int localityId);
 	  
