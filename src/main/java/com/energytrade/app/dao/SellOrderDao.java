@@ -1519,6 +1519,14 @@ try {
 	 	BigDecimal totalUnits =new BigDecimal((String)inputDetails.get("totalUnits"));
 	 	BigDecimal power = new BigDecimal("0");
 	 try {
+		 Timestamp startDate = Timestamp.valueOf(startTime);
+		 Timestamp endDate = Timestamp.valueOf(endTime);
+		 int count = nontradehourrepo.getOverlappingNonTradeHours(startTime, endTime);
+		 if( count > 0) {
+			 response.put("key", 401);
+			 response.put("message", "The time slot is overlapping with non-trade hours. Please choose different time slot.");
+			 return response;
+		 }
 		 if(totalUnits.compareTo(unitsToSell) <0) {
 				response.put("key", 401);
 				response.put("message", "Total in payload is less than units to sell.");
