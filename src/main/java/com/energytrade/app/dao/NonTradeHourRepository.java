@@ -62,5 +62,6 @@ public interface NonTradeHourRepository extends JpaRepository<NonTradeHour, Long
 	  @Query("Select a from LocalityPl a where a.localityId=?1 ") 
 	  LocalityPl getLocality( int localityId);
 	 
-        
+	  @Query(nativeQuery = true, value = "Select count(*) from non_trade_hours a where ?1 < a.end_ts and a.start_ts < ?2 and status_id = 1")
+      int getOverlappingNonTradeHours(String startDate, String endDate);
 }
