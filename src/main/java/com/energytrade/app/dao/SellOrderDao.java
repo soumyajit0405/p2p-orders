@@ -649,11 +649,11 @@ try {
  			if(allSellList.get(i).getIsFineApplicable() != null) {
  				allsellorderdto.setIsFineApplicable(allSellList.get(i).getIsFineApplicable());
  			}
-			if(cm.checkUpcomingStatus(allSellList.get(i).getTransferStartTs()).equalsIgnoreCase("Y")) {
-				upcomingListDto.add(allsellorderdto);	
+			if(cm.isOrderCompleted(allSellList.get(i).getTransferStartTs())) {
+				completedListDto.add(allsellorderdto);
 			}
 			else {
-				completedListDto.add(allsellorderdto);
+				upcomingListDto.add(allsellorderdto);
 			}
 			
 		}
@@ -689,11 +689,11 @@ try {
      				allsellorderdto.setIsFineApplicable(sellorder.getIsFineApplicable());
      			}
     			allcontractdto.setSellorder(allsellorderdto);
-    			if(cm.checkUpcomingStatus(sellorder.getTransferStartTs()).equalsIgnoreCase("Y")) {
-    				upcomingContractListDto.add(allcontractdto);
+    			if(cm.isOrderCompleted(sellorder.getTransferStartTs())) {
+    				completedContractListDto.add(allcontractdto);
     			}
     			else {
-    			completedContractListDto.add(allcontractdto);	
+    				upcomingContractListDto.add(allcontractdto);
     			}
     			
     		}
