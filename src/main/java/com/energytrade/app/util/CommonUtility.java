@@ -127,23 +127,13 @@ return authCode;
  	      
 	    }
 	
-	public  String checkUpcomingStatus(Timestamp startTime) throws IOException {
+	public  boolean isOrderCompleted(Timestamp startTime) throws IOException {
 		   
-		 Timestamp currentTime = new Timestamp(System.currentTimeMillis());
+		Timestamp currentTime = new Timestamp(System.currentTimeMillis());
 	    long milliseconds = startTime.getTime() - currentTime.getTime();
-	    int seconds = (int) milliseconds / 1000;
-	 
-	    // calculate hours minutes and seconds
-	    int hours = seconds / 3600;
-	    int minutes = hours* 60;
-	    if(minutes > 0) {
-	    	return "Y";
-	    }
-	    else {
-	    	return "N";
-	    }
-	      
-	    }
+	    
+	    return milliseconds < 0;
+    }
 	
 	public  String setIsCancellableNonTrade(Timestamp startTime) throws IOException {
 		   
