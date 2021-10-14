@@ -118,23 +118,23 @@ public interface AllSellOrderRepository extends JpaRepository<AllSellOrder, Long
 	  List<AllContract> getAllContractsByUser(int userId, Date startDate, Date endDate, int statusId);
 	 
 	 @Query(nativeQuery = true, value = "select max(a) from (select count(*) as a from all_sell_orders where transfer_start_ts <= ?2 and transfer_end_ts >=?2 "
-	 		+ "and seller_id =?1 and order_status_id=?4 "
+	 		+ "and seller_id =?1 and order_status_id in (1,3) "
 	 		+ "union "
 	 		+ "select count(*) as a from all_sell_orders where transfer_start_ts <= ?3 and transfer_end_ts >=?3 "
-	 		+ "and seller_id =?1 and order_status_id=?4 "
+	 		+ "and seller_id =?1 and order_status_id in (1,3) "
 	 		+ "union  "
 	 		+ "select count(*) as a from all_sell_orders where transfer_start_ts >= ?2 and transfer_end_ts <=?3 "
-	 		+ "and seller_id =?1 and order_status_id=?4) as tab") 
-	 int validateSellOrder(int userId, String startDate, String endDate, int statusId);
+	 		+ "and seller_id =?1 and order_status_id in (1,3)) as tab") 
+	 int validateSellOrder(int userId, String startDate, String endDate);
 	 
 	 @Query(nativeQuery = true, value = "select sum(a) from (select power_to_sell as a from all_sell_orders where transfer_start_ts <= ?2 and transfer_end_ts >=?2 "
-		 		+ "and seller_id =?1 and order_status_id=?4 "
+		 		+ "and seller_id =?1 and order_status_id in (1,3) "
 		 		+ "union "
 		 		+ "select power_to_sell as a from all_sell_orders where transfer_start_ts <= ?3 and transfer_end_ts >=?3 "
-		 		+ "and seller_id =?1 and order_status_id=?4 "
+		 		+ "and seller_id =?1 and order_status_id in (1,3) "
 		 		+ "union  "
 		 		+ "select power_to_sell as a from all_sell_orders where transfer_start_ts >= ?2 and transfer_end_ts <=?3 "
-		 		+ "and seller_id =?1 and order_status_id=?4) as tab") 
+		 		+ "and seller_id =?1 and order_status_id in (1,3)) as tab") 
 		 BigDecimal validateSellOrderByPower(int userId, String startDate, String endDate, int statusId);
 	 
 	 @Query(nativeQuery = true, value = "select max(a) from ( "
