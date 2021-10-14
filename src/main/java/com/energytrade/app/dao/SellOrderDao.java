@@ -1529,11 +1529,11 @@ try {
 		 }
 		 if(totalUnits.compareTo(unitsToSell) <0) {
 				response.put("key", 401);
-				response.put("message", "Total in payload is less than units to sell.");
+				response.put("message", "Exceeding total capacity of energy asset.");
 				return response;
 		 }
 		if(tradeType.equalsIgnoreCase("buy")) {
-			int status = allsellorderrepo.validateSellOrder(userId, startTime, endTime, 1);
+			int status = allsellorderrepo.validateSellOrder(userId, startTime, endTime);
 			System.out.println(status);
 			if(status > 0) {
 				response.put("key", 401);
